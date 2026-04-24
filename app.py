@@ -8,6 +8,9 @@ chat_history = []
 import os
 API_KEY = os.environ.get("API_KEY")
 
+print("API KEY EXISTS:", API_KEY is not None)
+print("API KEY START:", API_KEY[:6] if API_KEY else "NO KEY")
+
 
 def get_response(user_input):
     url = "https://openrouter.ai/api/v1/chat/completions"
