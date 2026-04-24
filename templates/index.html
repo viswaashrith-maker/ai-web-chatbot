@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: black;
+            color: white;
+            text-align: center;
+        }
+
+        .chat-box {
+            width: 400px;
+            margin: auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px gray;
+        }
+
+        h2 {
+            color: white;
+        }
+
+        .messages {
+            text-align: left;
+            margin-bottom: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 8px;
+            border-radius: 10px;
+            max-width: 75%;
+        }
+
+        .user {
+            background-color: #007bff;
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .bot {
+            background-color: #333;
+            color: white;
+            margin-right: auto;
+        }
+
+        input {
+            width: 70%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .clear-btn {
+            background-color: red;
+        }
+
+        .clear-btn:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-box">
+    <h2>Chatbot</h2>
+
+    <div class="messages">
+        {% for sender, message in chat_history %}
+            {% if sender == "You" %}
+                <div class="message user">
+                    <b>You:</b> {{ message }}
+                </div>
+            {% else %}
+                <div class="message bot">
+                    <b>Bot:</b> {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <form method="POST">
+        <input type="text" name="user_input" placeholder="Type message..." required>
+        <button type="submit">Send</button>
+    </form>
+
+    <form action="/clear" method="get">
+        <button type="submit" class="clear-btn">Clear Chat</button>
+    </form>
+</div>
+
+<script>
+    var chatBox = document.querySelector('.messages');
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+</body>
+</html>
