@@ -1,18 +1,18 @@
 from flask import Flask, render_template, request, redirect
 import requests
+import os
 
 app = Flask(__name__)
 
 chat_history = []
 
-import os
 API_KEY = os.environ.get("API_KEY", "").strip()
-
-print("API KEY EXISTS:", API_KEY is not None)
-print("API KEY START:", API_KEY[:6] if API_KEY else "NO KEY")
 
 
 def get_response(user_input):
+    if not API_KEY:
+        return "API key missing on server"
+
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
@@ -28,17 +28,18 @@ def get_response(user_input):
             {"role": "user", "content": user_input}
         ]
     }
-    if not API_KEY:
-        return "API key missing on server"
+
     response = requests.post(url, headers=headers, json=data)
     result = response.json()
 
-    print(result)  # this shows real API response in PyCharm terminal
+    print("API KEY EXISTS:", bool(API_KEY))
+    print("API KEY START:", API_KEY[:6])
+    print("OPENROUTER RESPONSE:", result)
 
     if "choices" in result:
         return result["choices"][0]["message"]["content"]
-    else:
-        return "AI error: " + str(result)
+
+    return "AI error: " + str(result)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -46,7 +47,7 @@ def home():
     global chat_history
 
     if request.method == "POST":
-        user_input = request.form["user_input"].lower()
+        user_input = request.form["user_input"]
         response = get_response(user_input)
 
         chat_history.append(("You", user_input))
@@ -60,7 +61,8 @@ def clear_chat():
     global chat_history
     chat_history = []
     return redirect("/")
-import os
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
