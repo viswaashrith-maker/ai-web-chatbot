@@ -17,7 +17,10 @@ def get_response(user_input):
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://ai-web-chatbot-ckj1.onrender.com",
+        "X-Title": "Ashrith AI Bot"
+
     }
 
     data = {
