@@ -6,7 +6,7 @@ app = Flask(__name__)
 chat_history = []
 
 import os
-API_KEY = os.environ.get("API_KEY")
+API_KEY = os.environ.get("API_KEY", "").strip()
 
 print("API KEY EXISTS:", API_KEY is not None)
 print("API KEY START:", API_KEY[:6] if API_KEY else "NO KEY")
@@ -16,11 +16,10 @@ def get_response(user_input):
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {API_KEY}",
+        "Authorization": "Bearer " + API_KEY,
         "Content-Type": "application/json",
         "HTTP-Referer": "https://ai-web-chatbot-ckj1.onrender.com",
         "X-Title": "Ashrith AI Bot"
-
     }
 
     data = {
@@ -29,7 +28,8 @@ def get_response(user_input):
             {"role": "user", "content": user_input}
         ]
     }
-
+    if not API_KEY:
+        return "API key missing on server"
     response = requests.post(url, headers=headers, json=data)
     result = response.json()
 
