@@ -32,9 +32,9 @@ def get_response(user_input):
     response = requests.post(url, headers=headers, json=data)
     result = response.json()
 
-    print("API KEY EXISTS:", bool(API_KEY))
-    print("API KEY START:", API_KEY[:6])
-    print("OPENROUTER RESPONSE:", result)
+    print("API KEY EXISTS:", bool(API_KEY), flush=True)
+    print("API KEY START:", API_KEY[:6], flush=True)
+    print("OPENROUTER RESPONSE:", result, flush=True)
 
     if "choices" in result:
         return result["choices"][0]["message"]["content"]
