@@ -5,7 +5,8 @@ app = Flask(__name__)
 
 chat_history = []
 
-API_KEY = "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"
+import os
+API_KEY = os.environ.get("API_KEY")
 
 
 def get_response(user_input):
