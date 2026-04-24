@@ -61,7 +61,12 @@ def clear_chat():
     global chat_history
     chat_history = []
     return redirect("/")
-
+@app.route("/debug-key")
+def debug_key():
+    return {
+        "key_exists": bool(API_KEY),
+        "key_start": API_KEY[:6] if API_KEY else "NO KEY"
+    }
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
