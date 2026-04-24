@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 chat_history = []
 
-API_KEY = "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"
+API_KEY = "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"
 
 
 def get_response(user_input):
@@ -26,7 +26,12 @@ def get_response(user_input):
     response = requests.post(url, headers=headers, json=data)
     result = response.json()
 
-    return result["choices"][0]["message"]["content"]
+    print(result)  # this shows real API response in PyCharm terminal
+
+    if "choices" in result:
+        return result["choices"][0]["message"]["content"]
+    else:
+        return "AI error: " + str(result)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -51,4 +56,8 @@ def clear_chat():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+
+    if __name__ == "__main__":
+        port = int(os.environ.get("PORT", 5000))
+        app.run(host="0.0.0.0", port=port)
