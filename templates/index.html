@@ -206,12 +206,40 @@ text-align:right;
 }
 
 .input-area{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+    width:100%;
+}
 
-display:flex;
+.input-area input{
+    flex:1;
+    min-width:0;
+}
 
-gap:10px;
+@media (max-width:768px){
 
-margin-top:15px;
+.chat-box{
+    width:95%;
+    height:95vh;
+    padding:15px;
+}
+
+.input-area{
+    flex-direction:row;
+}
+
+input{
+    font-size:16px;
+}
+
+button{
+    padding:10px;
+}
+
+.message{
+    max-width:85%;
+}
 
 }
 
