@@ -1,117 +1,517 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chatbot</title>
-    <style>
-        body {
-            font-family: Arial;
-            background-color: black;
-            color: white;
-            text-align: center;
-        }
+<title>Ashrith AI Bot</title>
 
-        .chat-box {
-            width: 400px;
-            margin: auto;
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px gray;
-        }
+<style>
 
-        h2 {
-            color: white;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
-        .messages {
-            text-align: left;
-            margin-bottom: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
+body{
+height:100vh;
+background:
+linear-gradient(
+135deg,
+#000000,
+#180000,
+#2d0000
+);
 
-        .message {
-            padding: 10px;
-            margin: 8px;
-            border-radius: 10px;
-            max-width: 75%;
-        }
+display:flex;
+color:white;
+overflow:hidden;
+}
 
-        .user {
-            background-color: #007bff;
-            color: white;
-            margin-left: auto;
-            text-align: right;
-        }
+.container{
+width:100%;
+display:flex;
+}
 
-        .bot {
-            background-color: #333;
-            color: white;
-            margin-right: auto;
-        }
+.sidebar{
 
-        input {
-            width: 70%;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-        }
+width:250px;
 
-        button {
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+background:
+rgba(15,15,15,.85);
 
-        button:hover {
-            background-color: #0056b3;
-        }
+backdrop-filter:blur(15px);
 
-        .clear-btn {
-            background-color: red;
-        }
+padding:20px;
 
-        .clear-btn:hover {
-            background-color: darkred;
-        }
-    </style>
+border-right:
+1px solid rgba(255,0,0,.25);
+
+display:flex;
+flex-direction:column;
+}
+
+.logo{
+
+font-size:24px;
+font-weight:bold;
+
+margin-bottom:30px;
+
+text-align:center;
+
+text-shadow:
+0 0 10px red;
+
+}
+
+.side-btn{
+
+width:100%;
+
+padding:15px;
+
+margin-bottom:15px;
+
+border:none;
+
+border-radius:15px;
+
+cursor:pointer;
+
+color:white;
+
+background:
+linear-gradient(
+135deg,
+#8b0000,
+#ff2d2d
+);
+
+transition:.3s;
+}
+
+.side-btn:hover{
+
+transform:scale(1.03);
+
+box-shadow:
+0 0 15px rgba(255,0,0,.4);
+
+}
+
+.chat-section{
+
+flex:1;
+
+padding:20px;
+
+display:flex;
+flex-direction:column;
+}
+
+.chat-header{
+
+font-size:28px;
+
+margin-bottom:15px;
+
+text-align:center;
+
+text-shadow:
+0 0 10px rgba(255,0,0,.4);
+
+}
+
+.messages{
+
+flex:1;
+
+overflow-y:auto;
+
+padding:15px;
+
+display:flex;
+flex-direction:column;
+}
+
+.messages::-webkit-scrollbar{
+
+width:6px;
+
+}
+
+.messages::-webkit-scrollbar-thumb{
+
+background:#500000;
+border-radius:10px;
+
+}
+
+.message{
+
+padding:15px;
+
+margin:10px;
+
+max-width:70%;
+
+border-radius:20px;
+
+word-wrap:break-word;
+
+animation:fade .3s;
+}
+
+.user{
+
+margin-left:auto;
+
+background:
+linear-gradient(
+135deg,
+#8b0000,
+#ff2d2d
+);
+
+box-shadow:
+0 0 15px rgba(255,0,0,.3);
+
+border-top-right-radius:5px;
+
+}
+
+.bot{
+
+margin-right:auto;
+
+background:#1f1f1f;
+
+border:
+1px solid rgba(255,0,0,.2);
+
+border-top-left-radius:5px;
+
+}
+
+.timestamp{
+
+font-size:11px;
+
+opacity:.7;
+
+margin-top:8px;
+
+text-align:right;
+
+}
+
+.input-area{
+
+display:flex;
+
+gap:10px;
+
+margin-top:15px;
+
+}
+
+input{
+
+flex:1;
+
+padding:15px;
+
+background:#1a1a1a;
+
+border:none;
+
+border-radius:18px;
+
+color:white;
+
+outline:none;
+
+border:
+1px solid rgba(255,0,0,.25);
+
+}
+
+input:focus{
+
+box-shadow:
+0 0 15px rgba(255,0,0,.3);
+
+}
+
+.send-btn{
+
+padding:15px 20px;
+
+border:none;
+
+border-radius:18px;
+
+background:
+linear-gradient(
+135deg,
+#8b0000,
+#ff2d2d
+);
+
+color:white;
+
+cursor:pointer;
+
+}
+
+@keyframes fade{
+
+from{
+opacity:0;
+transform:translateY(10px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+@media(max-width:768px){
+
+.sidebar{
+width:90px;
+}
+
+.logo{
+font-size:13px;
+}
+
+.side-btn{
+font-size:10px;
+padding:10px;
+}
+
+.message{
+max-width:85%;
+}
+
+}
+pre{
+
+background:#0d0d0d;
+
+border:
+1px solid rgba(255,0,0,.3);
+
+border-radius:12px;
+
+padding:15px;
+
+overflow-x:auto;
+
+margin-top:10px;
+
+box-shadow:
+0 0 15px rgba(255,0,0,.15);
+
+}
+
+code{
+
+color:#ff5c5c;
+
+font-family:Consolas,monospace;
+
+font-size:14px;
+
+}
+    pre code{
+    white-space: pre-wrap;
+}
+    .copy-btn{
+
+background:#8b0000;
+
+color:white;
+
+border:none;
+
+padding:6px 12px;
+
+border-radius:8px;
+
+cursor:pointer;
+
+margin-bottom:10px;
+
+float:right;
+
+font-size:12px;
+
+}
+
+.copy-btn:hover{
+
+background:#ff2d2d;
+
+}
+</style>
 </head>
+
 <body>
 
-<div class="chat-box">
-    <h2>Ashrith AI Bot 🤖</h2>
+<div class="container">
 
-    <div class="messages">
-        {% for sender, message in chat_history %}
-            {% if sender == "You" %}
-                <div class="message user">
-                    <b>You:</b> {{ message }}
-                </div>
-            {% else %}
-                <div class="message bot">
-                    <b>Bot:</b> {{ message }}
-                </div>
-            {% endif %}
-        {% endfor %}
-    </div>
+<div class="sidebar">
 
-    <form method="POST">
-        <input type="text" name="user_input" placeholder="Type message..." required>
-        <button type="submit">Send</button>
-    </form>
+<div class="logo">
 
-    <form action="/clear" method="get">
-        <button type="submit" class="clear-btn">Clear Chat</button>
-    </form>
+Ashrith AI 🤖
+
+</div>
+
+<form action="/clear">
+
+<button
+type="submit"
+class="side-btn">
+
++ New Chat
+
+</button>
+
+</form>
+
+<form action="/clear">
+
+<button
+type="submit"
+class="side-btn">
+
+Clear Chat
+
+</button>
+
+</form>
+
+</div>
+
+<div class="chat-section">
+
+<div class="chat-header">
+
+Chat with Ashrith AI
+
+</div>
+
+<div class="messages">
+
+{% for sender, message, time in chat_history %}
+
+{% if sender=="You" %}
+
+<div class="message user">
+
+<b>{{sender}}</b>
+
+<br><br>
+
+{{message}}
+
+<div class="timestamp">
+
+{{time}}
+
+</div>
+
+</div>
+
+{% else %}
+
+<div class="message bot">
+
+<b>{{sender}}</b>
+
+<br><br>
+
+{{message|safe}}
+
+<div class="timestamp">
+
+{{time}}
+
+</div>
+
+</div>
+
+{% endif %}
+
+{% endfor %}
+
+</div>
+
+<form method="POST" class="input-area">
+
+<input
+type="text"
+name="user_input"
+placeholder="Ask something..."
+required
+autocomplete="off">
+
+<button
+type="submit"
+class="send-btn">
+
+Send 🚀
+
+</button>
+
+</form>
+
+</div>
+
 </div>
 
 <script>
-    var chatBox = document.querySelector('.messages');
-    chatBox.scrollTop = chatBox.scrollHeight;
+
+var chatBox =
+document.querySelector(".messages");
+
+chatBox.scrollTop =
+chatBox.scrollHeight;
+
+
+function copyCode(button){
+
+let codeBlock =
+button.nextElementSibling.querySelector("code");
+
+let code =
+codeBlock.innerText;
+
+navigator.clipboard.writeText(code)
+.then(() => {
+
+button.innerText = "Copied ✅";
+
+setTimeout(() => {
+
+button.innerText = "Copy 📋";
+
+},2000);
+
+})
+.catch(err => {
+
+console.log(err);
+
+});
+
+}
+
 </script>
 
 </body>
