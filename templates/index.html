@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Ashrith AI Bot</title>
+
 <style>
 
 *{
@@ -15,7 +24,6 @@ background:linear-gradient(
 #180000,
 #2d0000
 );
-
 display:flex;
 color:white;
 overflow:hidden;
@@ -28,226 +36,144 @@ height:100dvh;
 }
 
 .sidebar{
-
 width:250px;
-
 background:rgba(15,15,15,.85);
-
 backdrop-filter:blur(15px);
-
 padding:20px;
-
 border-right:1px solid rgba(255,0,0,.25);
-
 display:flex;
 flex-direction:column;
 }
 
 .logo{
-
 font-size:24px;
 font-weight:bold;
 margin-bottom:30px;
 text-align:center;
-
 text-shadow:0 0 10px red;
 }
 
 .side-btn{
-
 width:100%;
 padding:15px;
 margin-bottom:15px;
-
 border:none;
 border-radius:15px;
-
 cursor:pointer;
 color:white;
-
 background:linear-gradient(
 135deg,
 #8b0000,
 #ff2d2d
 );
-
 transition:.3s;
 }
 
 .side-btn:hover{
-
 transform:scale(1.03);
-
 box-shadow:0 0 15px rgba(255,0,0,.4);
-
 }
 
 .chat-section{
-
 flex:1;
-
 padding:20px;
-
 display:flex;
 flex-direction:column;
-
 height:100%;
 }
 
 .chat-header{
-
 font-size:28px;
-
 margin-bottom:15px;
-
 text-align:center;
-
-text-shadow:
-0 0 10px rgba(255,0,0,.4);
-
+text-shadow:0 0 10px rgba(255,0,0,.4);
 }
 
 .messages{
-
 flex:1;
-
 overflow-y:auto;
-
 padding:15px;
-
 display:flex;
 flex-direction:column;
 }
 
 .messages::-webkit-scrollbar{
-
 width:6px;
 }
 
 .messages::-webkit-scrollbar-thumb{
-
 background:#500000;
 border-radius:10px;
 }
 
 .message{
-
 padding:15px;
 margin:10px;
-
 max-width:70%;
-
 border-radius:20px;
-
 word-wrap:break-word;
-
-animation:fade .3s;
 }
 
 .user{
-
 margin-left:auto;
-
 background:linear-gradient(
 135deg,
 #8b0000,
 #ff2d2d
 );
-
-box-shadow:
-0 0 15px rgba(255,0,0,.3);
-
 border-top-right-radius:5px;
 }
 
 .bot{
-
 margin-right:auto;
-
 background:#1f1f1f;
-
 border:1px solid rgba(255,0,0,.2);
-
 border-top-left-radius:5px;
 }
 
 .timestamp{
-
 font-size:11px;
-
 opacity:.7;
-
 margin-top:8px;
-
 text-align:right;
 }
 
 .input-area{
-
 display:flex;
 gap:10px;
+margin-top:10px;
 width:100%;
-padding-top:10px;
+padding-bottom:10px;
 }
 
-input{
-
+.input-area input{
 flex:1;
-
+min-width:0;
 padding:15px;
-
 background:#1a1a1a;
-
 border:none;
-
 border-radius:18px;
-
 color:white;
-
 outline:none;
-
 border:1px solid rgba(255,0,0,.25);
 }
 
-input:focus{
-
-box-shadow:
-0 0 15px rgba(255,0,0,.3);
+.input-area input:focus{
+box-shadow:0 0 15px rgba(255,0,0,.3);
 }
 
 .send-btn{
-
 padding:15px 20px;
-
 border:none;
-
 border-radius:18px;
-
 background:linear-gradient(
 135deg,
 #8b0000,
 #ff2d2d
 );
-
 color:white;
-
 cursor:pointer;
 }
-
-@keyframes fade{
-
-from{
-opacity:0;
-transform:translateY(10px);
-}
-
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-/* MOBILE FIX */
 
 @media(max-width:768px){
 
@@ -275,81 +201,107 @@ font-size:20px;
 
 .message{
 max-width:90%;
-font-size:14px;
 }
 
 .input-area{
 position:sticky;
 bottom:0;
 background:#180000;
-padding:10px 0;
+padding-top:10px;
 }
 
-input{
-font-size:16px;
-}
-
-.send-btn{
-padding:12px;
-}
-
-}
-
-pre{
-
-background:#0d0d0d;
-
-border:
-1px solid rgba(255,0,0,.3);
-
-border-radius:12px;
-
-padding:15px;
-
-overflow-x:auto;
-
-margin-top:10px;
-
-box-shadow:
-0 0 15px rgba(255,0,0,.15);
-}
-
-code{
-
-color:#ff5c5c;
-
-font-family:Consolas,monospace;
-font-size:14px;
-}
-
-pre code{
-white-space:pre-wrap;
-}
-
-.copy-btn{
-
-background:#8b0000;
-
-color:white;
-
-border:none;
-
-padding:6px 12px;
-
-border-radius:8px;
-
-cursor:pointer;
-
-margin-bottom:10px;
-
-float:right;
-
-font-size:12px;
-}
-
-.copy-btn:hover{
-
-background:#ff2d2d;
 }
 
 </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="sidebar">
+
+<div class="logo">
+Ashrith AI 🤖
+</div>
+
+<form action="/clear">
+<button type="submit" class="side-btn">
++ New Chat
+</button>
+</form>
+
+<form action="/clear">
+<button type="submit" class="side-btn">
+Clear Chat
+</button>
+</form>
+
+</div>
+
+<div class="chat-section">
+
+<div class="chat-header">
+Chat with Ashrith AI
+</div>
+
+<div class="messages">
+
+{% for sender, message, time in chat_history %}
+
+{% if sender=="You" %}
+
+<div class="message user">
+<b>{{sender}}</b>
+<br><br>
+{{message}}
+<div class="timestamp">{{time}}</div>
+</div>
+
+{% else %}
+
+<div class="message bot">
+<b>{{sender}}</b>
+<br><br>
+{{message|safe}}
+<div class="timestamp">{{time}}</div>
+</div>
+
+{% endif %}
+{% endfor %}
+
+</div>
+
+<form method="POST" class="input-area">
+
+<input
+type="text"
+name="user_input"
+placeholder="Ask something..."
+required
+autocomplete="off">
+
+<button
+type="submit"
+class="send-btn">
+Send 🚀
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+var chatBox =
+document.querySelector(".messages");
+
+chatBox.scrollTop =
+chatBox.scrollHeight;
+
+</script>
+
+</body>
+</html>
