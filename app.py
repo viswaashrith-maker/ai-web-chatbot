@@ -13,6 +13,7 @@ load_dotenv()
 
 API_KEY = os.environ.get("API_KEY", "").strip()
 
+
 def format_response(text):
 
     import re
@@ -47,7 +48,10 @@ def format_response(text):
         "public class",
         "int main",
         "scanf",
-        "printf"
+        "printf",
+        "console.log",
+        "function(",
+        "import "
     ]
 
     if (
@@ -66,6 +70,49 @@ def format_response(text):
         '''
 
     return formatted
+
+
+def detect_coding_question(user_input):
+
+    coding_keywords = [
+
+        "python",
+        "java",
+        "javascript",
+        "html",
+        "css",
+        "flask",
+        "django",
+        "react",
+        "api",
+        "sql",
+        "program",
+        "programming",
+        "code",
+        "coding",
+        "bug",
+        "error",
+        "algorithm",
+        "function",
+        "compiler",
+        "compile",
+        "c++",
+        "c language",
+        "machine learning",
+        "ai model",
+        "backend",
+        "frontend",
+        "database"
+    ]
+
+    user_input = user_input.lower()
+
+    return any(
+        word in user_input
+        for word in coding_keywords
+    )
+
+
 def get_response(user_input):
 
     if not API_KEY:
@@ -80,6 +127,41 @@ def get_response(user_input):
         "X-Title": "Ashrith AI Bot"
     }
 
+    is_coding = detect_coding_question(user_input)
+
+    if is_coding:
+
+        system_prompt = """
+        You are Ashrith AI.
+
+        The user is asking a coding/programming question.
+
+        Rules:
+
+        1. Generate correct and executable code when needed.
+        2. Check syntax errors before sending.
+        3. Check logic errors before sending.
+        4. Add required imports or headers.
+        5. Return code inside markdown code blocks.
+        6. After the code, briefly explain the solution.
+        7. Keep explanations simple and clear.
+        """
+
+    else:
+
+        system_prompt = """
+        You are Ashrith AI.
+
+        The user is asking a general/non-technical question.
+
+        Rules:
+
+        1. Answer naturally like ChatGPT.
+        2. Be friendly and conversational.
+        3. Do NOT generate programming code unless explicitly asked.
+        4. Give direct and human-like answers.
+        """
+
     data = {
         "model": "openai/gpt-3.5-turbo",
 
@@ -87,22 +169,7 @@ def get_response(user_input):
 
             {
                 "role": "system",
-                "content": """
-    You are Ashrith AI.
-
-    When user asks for code:
-
-    1. Generate working executable code only.
-    2. Check syntax errors.
-    3. Check logic errors.
-    4. Add missing imports or headers.
-    5. Simulate compiling the code mentally.
-    6. If any issue exists, fix it before sending.
-    7. Return code in markdown blocks.
-    8. After code, briefly explain what was checked.
-
-    Never send incomplete code.
-    """
+                "content": system_prompt
             }
 
         ]
