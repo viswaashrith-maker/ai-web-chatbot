@@ -301,6 +301,23 @@ document.querySelector(".messages");
 chatBox.scrollTop =
 chatBox.scrollHeight;
 
+function copyCode(button) {
+  var codeBlock = button.nextElementSibling;
+  if (!codeBlock) return;
+
+  var text = codeBlock.innerText || codeBlock.textContent;
+
+  navigator.clipboard.writeText(text).then(function() {
+    button.textContent = "Copied! ✅";
+    setTimeout(function() {
+      button.textContent = "Copy 📋";
+    }, 1500);
+  }).catch(function(err) {
+    console.error("Copy failed:", err);
+    button.textContent = "Copy failed";
+  });
+}
+
 </script>
 
 </body>
