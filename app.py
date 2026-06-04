@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, jsonify
+import fitz
+import uuid
 import requests
 import os
 import re
 from dotenv import load_dotenv
 from datetime import datetime
+from rag import get_context_string, add_document, get_collection_count
 
 app = Flask(__name__)
 
@@ -118,6 +121,9 @@ def get_response(user_input):
     if not API_KEY:
         return "API key missing on server"
 
+    context = get_context_string(user_input, k=3)
+    print("RAG CONTEXT:", context)
+
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
@@ -127,11 +133,29 @@ def get_response(user_input):
         "X-Title": "Ashrith AI Bot"
     }
 
-    is_coding = detect_coding_question(user_input)
+    if context:
+        system_prompt = f"""
+        You are Ashrith AI.
 
-    if is_coding:
+        The user may be asking a question about an uploaded document.
+        Use the uploaded document context only if it is directly relevant to the user's question.
+        If the question is about chat history, personal preferences, or general knowledge,
+        answer from chat history or normal knowledge instead.
 
-        system_prompt = """
+        {context}
+
+        Rules:
+
+        1. Prefer document context only when it helps answer the current question.
+        2. If the document is irrelevant, ignore it and answer from chat/general knowledge.
+        3. Keep answers concise and accurate.
+        4. Do not mention programming unless the user asks about programming.
+        5. Do not suggest coding help.
+        """
+
+    elif detect_coding_question(user_input):
+
+        system_prompt = f"""
         You are Ashrith AI.
 
         The user is asking a coding/programming question.
@@ -149,7 +173,7 @@ def get_response(user_input):
 
     else:
 
-        system_prompt = """
+        system_prompt = f"""
         You are Ashrith AI.
 
         The user is asking a general/non-technical question.
@@ -233,7 +257,16 @@ def get_response(user_input):
     except Exception as e:
 
         return "Error: " + str(e)
+def extract_pdf_text(pdf_path):
 
+    text = ""
+
+    pdf = fitz.open(pdf_path)
+
+    for page in pdf:
+        text += page.get_text()
+
+    return text
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -280,7 +313,59 @@ def home():
 
     )
 
+@app.route("/upload", methods=["POST"])
+def upload_pdf():
 
+    try:
+
+        uploaded_file = request.files["document"]
+
+        if uploaded_file.filename == "":
+            return redirect("/")
+
+        file_path = os.path.join(
+            "uploads",
+            uploaded_file.filename
+        )
+
+        uploaded_file.save(file_path)
+
+        text = extract_pdf_text(file_path)
+
+        add_document(
+            str(uuid.uuid4()),
+            text,
+            metadata={
+                "filename": uploaded_file.filename
+            }
+        )
+
+        current_time = datetime.now().strftime("%I:%M %p")
+
+        chat_history.append(
+            (
+                "Bot",
+                f"✅ PDF uploaded successfully: {uploaded_file.filename}",
+                current_time
+            )
+        )
+
+        return redirect("/")
+
+    except Exception as e:
+
+        current_time = datetime.now().strftime("%I:%M %p")
+
+        chat_history.append(
+            (
+                "Bot",
+                f"❌ Upload failed: {str(e)}",
+                current_time
+            )
+        )
+
+        return redirect("/")
+    
 @app.route("/clear")
 def clear_chat():
 
@@ -289,6 +374,37 @@ def clear_chat():
     chat_history = []
 
     return redirect("/")
+
+
+@app.route("/add-document", methods=["POST"])
+def add_doc():
+    """Add a document to the knowledge base."""
+    try:
+        data = request.get_json()
+        doc_id = data.get("doc_id", "")
+        content = data.get("content", "")
+        
+        if not doc_id or not content:
+            return jsonify({"error": "Missing doc_id or content"}), 400
+        
+        add_document(doc_id, content, metadata={"source": "web"})
+        return jsonify({"success": True, "message": "Document added"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/kb-stats")
+def kb_stats():
+    """Get knowledge base statistics."""
+    try:
+        count = get_collection_count()
+        return jsonify({
+            "documents_count": count,
+            "rag_enabled": True
+        }), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
