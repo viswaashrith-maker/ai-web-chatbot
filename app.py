@@ -410,7 +410,9 @@ def upload_pdf():
 
         if uploaded_file.filename == "":
             return redirect("/")
-
+        
+        os.makedirs("uploads", exist_ok=True)
+        
         file_path = os.path.join(
             "uploads",
             uploaded_file.filename
