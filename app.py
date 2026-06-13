@@ -4,17 +4,98 @@ import uuid
 import requests
 import os
 import re
+import json
 from dotenv import load_dotenv
 from datetime import datetime
 from rag import get_context_string, add_document, get_collection_count
 
 app = Flask(__name__)
 
-chat_history = []
-
 load_dotenv()
 
 API_KEY = os.environ.get("API_KEY", "").strip()
+
+# File-backed chat history
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+CHAT_HISTORY_FILE = os.path.join(APP_DIR, "chat_history.json")
+
+def load_chat_history():
+    try:
+        if os.path.exists(CHAT_HISTORY_FILE):
+            with open(CHAT_HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, list) else []
+    except Exception:
+        return []
+    return []
+
+def save_chat_history():
+    try:
+        with open(CHAT_HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(chat_history, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print("Failed to save chat history:", e)
+
+# initialize chat history from disk
+chat_history = load_chat_history()
+# currently loaded session id (None if composing a fresh chat)
+current_session_id = None
+
+# Sessions storage (multiple saved chats)
+SESSIONS_FILE = os.path.join(APP_DIR, "sessions.json")
+
+def load_sessions():
+    try:
+        if os.path.exists(SESSIONS_FILE):
+            with open(SESSIONS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, list) else []
+    except Exception:
+        return []
+    return []
+
+def save_sessions(sessions):
+    try:
+        with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(sessions, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print("Failed to save sessions:", e)
+
+def save_current_as_session():
+    try:
+        if not chat_history:
+            return
+        sessions = load_sessions()
+        session_id = str(uuid.uuid4())
+        # avoid creating a duplicate session if messages match an existing one
+        for s in sessions:
+            if s.get("messages") == chat_history:
+                # move matching session to the top so it appears first in sidebar
+                matching = s
+                sessions.remove(s)
+                sessions.insert(0, matching)
+                save_sessions(sessions)
+                return matching.get("id")
+        # pick first user message as title or fallback to timestamp
+        title = None
+        for item in chat_history:
+            if isinstance(item, (list, tuple)) and len(item) >= 2 and item[0] == "You":
+                title = item[1][:50]
+                break
+        if not title:
+            title = "Chat " + datetime.now().strftime("%Y-%m-%d %I:%M %p")
+
+        sessions.insert(0, {
+            "id": session_id,
+            "title": title,
+            "created_at": datetime.now().strftime("%Y-%m-%d %I:%M %p"),
+            "messages": chat_history.copy()
+        })
+
+        save_sessions(sessions)
+        return session_id
+    except Exception as e:
+        print("Failed to save current session:", e)
 
 
 def format_response(text):
@@ -306,10 +387,17 @@ def home():
 
         )
 
+        # persist chat history to disk
+        try:
+            save_chat_history()
+        except Exception:
+            pass
+
     return render_template(
 
         "index.html",
-        chat_history=chat_history
+        chat_history=chat_history,
+        sessions=load_sessions()
 
     )
 
@@ -350,6 +438,12 @@ def upload_pdf():
             )
         )
 
+        # persist upload notification
+        try:
+            save_chat_history()
+        except Exception:
+            pass
+
         return redirect("/")
 
     except Exception as e:
@@ -364,6 +458,12 @@ def upload_pdf():
             )
         )
 
+        # persist failure message
+        try:
+            save_chat_history()
+        except Exception:
+            pass
+
         return redirect("/")
     
 @app.route("/clear")
@@ -372,6 +472,75 @@ def clear_chat():
     global chat_history
 
     chat_history = []
+
+    # persist cleared state
+    try:
+        save_chat_history()
+    except Exception:
+        pass
+
+    return redirect("/")
+
+
+@app.route("/new-chat")
+def new_chat():
+    """Save current chat as a session and start a new chat."""
+    global chat_history
+    global current_session_id
+    try:
+        # if the current chat was loaded from an existing session, don't save it again
+        if current_session_id is None:
+            save_current_as_session()
+    except Exception:
+        pass
+
+    chat_history = []
+    current_session_id = None
+
+    # persist cleared state for new chat
+    try:
+        save_chat_history()
+    except Exception:
+        pass
+
+    return redirect("/")
+
+
+@app.route("/load/<session_id>")
+def load_session(session_id):
+    """Load a saved session into the current chat view."""
+    global chat_history
+    sessions = load_sessions()
+    for s in sessions:
+        if s.get("id") == session_id:
+            chat_history = s.get("messages", []).copy()
+            # mark this session as the currently loaded one
+            global current_session_id
+            current_session_id = session_id
+            try:
+                save_chat_history()
+            except Exception:
+                pass
+            break
+    return redirect("/")
+
+
+@app.route("/delete-session/<session_id>", methods=["POST"])
+def delete_session(session_id):
+    global chat_history
+    global current_session_id
+
+    sessions = load_sessions()
+    sessions = [s for s in sessions if s.get("id") != session_id]
+    save_sessions(sessions)
+
+    if current_session_id == session_id:
+        chat_history = []
+        current_session_id = None
+        try:
+            save_chat_history()
+        except Exception:
+            pass
 
     return redirect("/")
 

@@ -43,6 +43,19 @@ padding:20px;
 border-right:1px solid rgba(255,0,0,.25);
 display:flex;
 flex-direction:column;
+overflow-y:auto;
+}
+
+.sidebar-top{
+  position:sticky;
+  top:0;
+  z-index:2;
+}
+
+.sidebar-list{
+  margin-top:10px;
+  overflow-y:auto;
+  flex:1;
 }
 
 .logo{
@@ -104,6 +117,15 @@ width:6px;
 .messages::-webkit-scrollbar-thumb{
 background:#500000;
 border-radius:10px;
+}
+
+/* Sidebar scrollbar styles */
+.sidebar::-webkit-scrollbar{
+  width:8px;
+}
+.sidebar::-webkit-scrollbar-thumb{
+  background:rgba(255,0,0,0.15);
+  border-radius:10px;
 }
 
 .message{
@@ -221,21 +243,29 @@ padding-top:10px;
 
 <div class="sidebar">
 
-<div class="logo">
-Ashrith AI 🤖
-</div>
+  <div class="sidebar-top">
+    <div class="logo">
+      Ashrith AI 🤖
+    </div>
 
-<form action="/clear">
-<button type="submit" class="side-btn">
-+ New Chat
-</button>
-</form>
+    <form action="/new-chat">
+      <button type="submit" class="side-btn">+ New Chat</button>
+    </form>
+  </div>
 
-<form action="/clear">
-<button type="submit" class="side-btn">
-Clear Chat
-</button>
-</form>
+  <div class="sidebar-list">
+    <div style="opacity:.8;margin-bottom:8px;">Previous Chats</div>
+    {% for s in sessions %}
+    <div style="display:flex; gap:8px; margin-bottom:10px;">
+      <form action="/load/{{s.id}}" method="get" style="flex:1;">
+        <button type="submit" class="side-btn">{{ s.title }}</button>
+      </form>
+      <form action="/delete-session/{{s.id}}" method="post">
+        <button type="submit" class="side-btn" style="background:rgba(255,0,0,0.7);">Delete</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
 
 </div>
 
